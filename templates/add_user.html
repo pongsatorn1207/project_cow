@@ -1,0 +1,24 @@
+<!-- templates/add_user.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>เพิ่มผู้ใช้</title>
+</head>
+<body>
+    <h2>เพิ่มผู้ใช้</h2>
+    <form method="POST">
+        <label>Username:</label><br>
+        <input type="text" name="username" required><br>
+        <label>Password:</label><br>
+        <input type="password" name="password" required><br>
+        <label>Role:</label><br>
+        <select name="role">
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+        </select><br><br>
+        <button type="submit">เพิ่ม</button>
+    </form>
+    <a href="{{ url_for('dashboard') }}">กลับ</a>
+</body>
+</html>

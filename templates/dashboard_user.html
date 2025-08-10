@@ -1,0 +1,36 @@
+/* templates/dashboard_user.html */
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-4">
+    <h2>สวัสดีคุณ {{ username }}</h2>
+    <a href="/logout" class="btn btn-secondary float-end">ออกจากระบบ</a>
+
+    <h4 class="mt-4">ข้อมูลล่าสุด</h4>
+    <table class="table table-bordered table-striped">
+        <thead>
+        <tr>
+            <th>เวลา</th>
+            <th>อุณหภูมิ (°C)</th>
+            <th>ภาพ</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in data %}
+            <tr>
+                <td>{{ row['timestamp'] }}</td>
+                <td>{{ row['temperature'] }}</td>
+                <td><img src="/{{ row['image_path'] }}" width="100"></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

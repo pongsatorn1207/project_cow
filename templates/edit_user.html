@@ -1,0 +1,22 @@
+<!-- templates/edit_user.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>แก้ไขผู้ใช้</title>
+</head>
+<body>
+    <h2>แก้ไขผู้ใช้: {{ username }}</h2>
+    <form method="POST">
+        <label>New Password:</label><br>
+        <input type="password" name="password" required><br>
+        <label>Role:</label><br>
+        <select name="role">
+            <option value="user" {% if role == 'user' %}selected{% endif %}>User</option>
+            <option value="admin" {% if role == 'admin' %}selected{% endif %}>Admin</option>
+        </select><br><br>
+        <button type="submit">บันทึก</button>
+    </form>
+    <a href="{{ url_for('dashboard') }}">กลับ</a>
+</body>
+</html>
