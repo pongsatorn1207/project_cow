@@ -1,60 +1,71 @@
-/* templates/dashboard_admin.html */
+{% extends 'base.html' %}
+{% block title %}แดชบอร์ด - ผู้ดูแล{% endblock %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-</head>
-<body>
-<div class="container mt-4">
-    <h2>ยินดีต้อนรับผู้ดูแลระบบ {{ username }}</h2>
-    <a href="/logout" class="btn btn-secondary float-end">ออกจากระบบ</a>
-    <h4 class="mt-4">ภาพและข้อมูลจากระบบ</h4>
-    <table class="table table-bordered table-striped">
-        <thead>
-        <tr>
-            <th>เวลา</th>
-            <th>อุณหภูมิ (°C)</th>
-            <th>ภาพ</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for row in data %}
-            <tr>
-                <td>{{ row['timestamp'] }}</td>
-                <td>{{ row['temperature'] }}</td>
-                <td><img src="/{{ row['image_path'] }}" width="100"></td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+  <h4 class="mb-0">แดชบอร์ด</h4>
 
-    <hr>
-    <h4>จัดการผู้ใช้</h4>
-    <a href="/add_user" class="btn btn-success mb-3">เพิ่มผู้ใช้</a>
-    <table class="table table-bordered">
-        <thead>
-        <tr>
-            <th>ชื่อผู้ใช้</th>
-            <th>สิทธิ์</th>
-            <th>จัดการ</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for name, info in users.items() %}
-            <tr>
-                <td>{{ name }}</td>
-                <td>{{ info['role'] }}</td>
-                <td>
-                    <a href="/edit_user/{{ name }}" class="btn btn-warning btn-sm">แก้ไข</a>
-                    <a href="/delete_user/{{ name }}" class="btn btn-danger btn-sm">ลบ</a>
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+  <div class="d-flex flex-wrap align-items-center gap-2">
+    <input type="date" id="searchDate" class="form-control" style="max-width:170px" value="{{ date_filter or '' }}">
+    <input type="number" step="0.1" min="0" id="minTemp" class="form-control" style="max-width:150px"
+           placeholder="ขั้นต่ำ °C" value="{{ min_temp or '' }}">
+    <input type="time" id="startTime" class="form-control" style="max-width:140px" value="{{ start_time or '' }}">
+    <span class="text-muted">–</span>
+    <input type="time" id="endTime" class="form-control" style="max-width:140px" value="{{ end_time or '' }}">
+    <button class="btn btn-secondary" onclick="applyFilters()">ค้นหา</button>
+    <a id="dlBtn" class="btn btn-success"
+       href="{{ url_for('download_xlsx', date=date_filter or None, min_temp=min_temp or None, start_time=start_time or None, end_time=end_time or None) }}">
+      ดาวน์โหลด Excel
+    </a>
+    <span class="badge text-bg-primary">{{ username }}</span>
+  </div>
 </div>
-</body>
-</html>
+
+{% if data|length == 0 %}
+  <div class="text-center text-muted py-5">
+    <div class="mb-2" style="font-size:2rem;">🔍</div>
+    <h5 class="mb-1">ไม่พบข้อมูล</h5>
+    <div class="small">ลองปรับวันที่ / อุณหภูมิต่ำสุด / ช่วงเวลา ใหม่อีกครั้ง</div>
+  </div>
+{% else %}
+  <div class="grid">
+    {% for row in data %}
+    <div class="card shadow-sm">
+      <img src="/{{ row['image_path'] }}" class="card-img-top" alt="">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          <h5 class="card-title mb-0">{{ row['temperature'] }} °C</h5>
+          <span class="badge text-bg-light">{{ row['timestamp'] }}</span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<script>
+function buildQuery(){
+  const d  = document.getElementById('searchDate').value.trim();
+  const mt = document.getElementById('minTemp').value.trim();
+  const st = document.getElementById('startTime').value.trim();
+  const et = document.getElementById('endTime').value.trim();
+  const p = new URLSearchParams();
+  if(d) p.set('date', d);
+  if(mt) p.set('min_temp', mt);
+  if(st && et){ p.set('start_time', st); p.set('end_time', et); }
+  return p.toString();
+}
+function applyFilters(){
+  const q = buildQuery();
+  const base = "{{ url_for('dashboard') }}";
+  window.location.href = q ? (base + "?" + q) : base;
+}
+['searchDate','minTemp','startTime','endTime'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el){ el.addEventListener('change', ()=>{
+    const q=buildQuery(); const a=document.getElementById('dlBtn');
+    a.href = q ? ("{{ url_for('download_xlsx') }}?"+q) : "{{ url_for('download_xlsx') }}";
+  });}
+});
+</script>
+{% endblock %}

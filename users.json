@@ -4,7 +4,15 @@
         "role": "admin"
     },
     "jeen": {
-        "password": "jeent",
+        "password": "user123",
+        "role": "user"
+    },
+    "preaw": {
+        "password": "1",
+        "role": "admin"
+    },
+    "a": {
+        "password": "1",
         "role": "user"
     }
 }
